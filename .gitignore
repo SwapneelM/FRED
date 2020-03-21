@@ -1,0 +1,8 @@
+*.o
+
+bin/
+populations/
+
+src/DEPENDS
+src/FRED
+

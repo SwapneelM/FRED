@@ -51,6 +51,9 @@ class Place;
 #include <cstdlib>
 #include <cxxabi.h>
 
+#include <pyprob_cpp.h>
+
+
 
 //FRED main program
 
