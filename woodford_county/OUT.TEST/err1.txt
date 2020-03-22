@@ -1,1 +1,0 @@
-FRED WARNING: <Activities.cc, LINE:1803> become_a_teacher: person 23300 age 18 ineligible -- already goes to school 19009 S450110845
