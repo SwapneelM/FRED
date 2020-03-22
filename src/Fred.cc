@@ -50,6 +50,7 @@ class Place;
 #include <csignal>
 #include <cstdlib>
 #include <cxxabi.h>
+#include <string>
 
 #include <pyprob_cpp.h>
 #define PYPROB
@@ -60,11 +61,31 @@ class Place;
 int _argc;
 char** _argv;
 
+int param_idx(char* param_name)
+{
+  for(int i = 0; i < Params::param_count; i++)
+    if(strcmp(Params::param_name[i], param_name) == 0)
+      return i;
+}
+
 xt::xarray<double> forward()
 {
   fred_setup(_argc, _argv);
   for(Global::Simulation_Day = 0; Global::Simulation_Day < Global::Days; Global::Simulation_Day++) {
     fred_step(Global::Simulation_Day);
+
+    // Conditions
+    auto epidemic = Global::Diseases.get_disease(0)->get_epidemic();
+    auto total_dead = epidemic->get_total_case_fatality_count();
+    auto pop_size = Global::Pop.get_pop_size();
+    std::cout << "*****" << total_dead << std::endl;
+    std::cout << pop_size << std::endl;
+
+    auto death_rate = total_dead / pop_size;
+    // Condition: death rate < x%
+    // = Observe x% from Uniform(death_rate, 1+death_rate)
+    auto likelihood = pyprob_cpp::distributions::Uniform(death_rate, 1+death_rate);
+    pyprob_cpp::observe(likelihood, "obs_" + std::to_string(Global::Simulation_Day));
   }
   fred_finish();
   return 0;
@@ -126,6 +147,15 @@ void fred_setup(int argc, char* argv[]) {
 
   // get runtime parameters
   Params::read_parameters(paramfile);
+
+  #ifdef PYPROB
+  // Sample parameters of interest
+  char param_name[] = "isolation_rate";
+  auto prior = pyprob_cpp::distributions::Uniform(0, 1);
+  auto param_value = pyprob_cpp::sample(prior, std::string(param_name));
+  strcpy(Params::param_value[param_idx(param_name)], to_string(param_value[0]).c_str());
+  #endif
+
   Global::get_global_parameters();
   Date::setup_dates(Global::Start_date);
 
