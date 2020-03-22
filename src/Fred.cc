@@ -52,12 +52,12 @@ class Place;
 #include <cxxabi.h>
 #include <string>
 
-#include <pyprob_cpp.h>
 #define PYPROB
 
 //FRED main program
 
 #ifdef PYPROB
+#include <pyprob_cpp.h>
 int _argc;
 char** _argv;
 
