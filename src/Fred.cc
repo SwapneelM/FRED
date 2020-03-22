@@ -52,11 +52,35 @@ class Place;
 #include <cxxabi.h>
 
 #include <pyprob_cpp.h>
-
-
+#define PYPROB
 
 //FRED main program
 
+#ifdef PYPROB
+int _argc;
+char** _argv;
+
+xt::xarray<double> forward()
+{
+  fred_setup(_argc, _argv);
+  for(Global::Simulation_Day = 0; Global::Simulation_Day < Global::Days; Global::Simulation_Day++) {
+    fred_step(Global::Simulation_Day);
+  }
+  fred_finish();
+  return 0;
+}
+
+int main(int argc, char *argv[])
+{
+  assert(argc >= 2);
+  _argc =  argc - 1;
+  _argv = argv + 1;
+  auto serverAddress = argv[1];
+  pyprob_cpp::Model model = pyprob_cpp::Model(forward, "FRED");
+  model.startServer(serverAddress);
+  return 0;
+}
+#else
 int main(int argc, char* argv[]) {
   fred_setup(argc, argv);
   for(Global::Simulation_Day = 0; Global::Simulation_Day < Global::Days; Global::Simulation_Day++) {
@@ -65,6 +89,7 @@ int main(int argc, char* argv[]) {
   fred_finish();
   return 0;
 }
+#endif
 
 
 void fred_setup(int argc, char* argv[]) {
