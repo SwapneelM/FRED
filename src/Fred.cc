@@ -58,6 +58,7 @@ class Place;
 
 #ifdef PYPROB
 #include <pyprob_cpp.h>
+#include <time.h>
 int _argc;
 char** _argv;
 
@@ -68,6 +69,27 @@ int param_idx(char* param_name)
       return i;
 }
 
+double count_infected()
+{
+  const int DISEASE_ID = 0;
+  auto pop = &(Global::Pop);
+  int internal_pop_count = 0;
+  int infection_count = 0;
+  for (int p = 0; p < pop->get_index_size(); ++p) {
+    Person *person = pop->get_person_by_index(p);
+    if (person == NULL) {
+      continue;
+    }
+    auto health = person->get_health();
+    if(health->is_infected(DISEASE_ID)) {
+      infection_count++;
+    }
+    internal_pop_count++;
+  }
+  assert(internal_pop_count == pop->get_pop_size());
+  return infection_count;
+}
+
 xt::xarray<double> forward()
 {
   fred_setup(_argc, _argv);
@@ -75,16 +97,18 @@ xt::xarray<double> forward()
     fred_step(Global::Simulation_Day);
 
     // Conditions
-    auto epidemic = Global::Diseases.get_disease(0)->get_epidemic();
-    auto total_dead = epidemic->get_total_case_fatality_count();
+    auto total_dead = Global::Diseases.get_disease(0)->get_epidemic()->get_total_case_fatality_count();
     auto pop_size = Global::Pop.get_pop_size();
-    std::cout << "*****" << total_dead << std::endl;
-    std::cout << pop_size << std::endl;
+    auto infection_count = count_infected();
+    auto infection_rate = infection_count / pop_size;
+    std::cout << "-> Total dead: " << total_dead << std::endl;
+    std::cout << "-> Population size: " << pop_size << std::endl;
+    std::cout << "-> Infection count: " << infection_count << std::endl;
+    std::cout << "-> Infection rate: " << infection_rate*100 << '%' << std::endl;
 
-    auto death_rate = total_dead / pop_size;
-    // Condition: death rate < x%
-    // = Observe x% from Uniform(death_rate, 1+death_rate)
-    auto likelihood = pyprob_cpp::distributions::Uniform(death_rate, 1+death_rate);
+    // Condition: infection rate < x%
+    // = Observe x% from Uniform(infection_rate, 1+infection_rate)
+    auto likelihood = pyprob_cpp::distributions::Uniform(infection_rate, 1+infection_rate);
     pyprob_cpp::observe(likelihood, "obs_" + std::to_string(Global::Simulation_Day));
   }
   fred_finish();
@@ -190,7 +214,11 @@ void fred_setup(int argc, char* argv[]) {
     Global::Simulation_seed = Global::Seed;
   }
   fprintf(Global::Statusfp, "seed = %lu\n", Global::Simulation_seed);
+  #ifdef PYPROB
+  Random::set_seed(time(NULL));
+  #else
   Random::set_seed(Global::Simulation_seed);
+  #endif
 
   Utils::fred_print_lap_time("RNG setup");
   Utils::fred_print_wall_time("\nFRED run %d started", Global::Simulation_run_number);
