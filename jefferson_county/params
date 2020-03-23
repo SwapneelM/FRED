@@ -17,21 +17,21 @@ census_tract_visualization_mode = 1
 # 1) SHELTER IN PLACE
 # Assumptions for the paper:
 # We assume "perfect sheltering", that is,
-# - no delay, no decay, 100% compliance, no early starting, everyone shelters
+# - no delay, no decay, no early starting, everyone shelters
 # see lines 2390 - 2431 of Place_List.cc
 ##########################################################
 enable_shelter_in_place = 1 # <--- toggle on or off
 
 ######################################
 shelter_in_place_duration_mean = 1   # <--- put a prior over this
+shelter_in_place_compliance = 1      # <--- put a prior over this
 ######################################
 
 ######################################
 # Our assumptions
 shelter_in_place_duration_std = 1
-shelter_in_place_delay_mean = 0
+shelter_in_place_delay_mean = 7
 shelter_in_place_delay_std = 1
-shelter_in_place_compliance = 1
 shelter_in_place_early_rate = 0.0  # do people start sheltering before the order goes into effect?
 shelter_in_place_decay_rate = 0.0  # do people stop sheltering gradually the longer it is in place
 shelter_in_place_by_income = 0 # Do only high-income familes shelter?
