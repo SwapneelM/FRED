@@ -52,8 +52,6 @@ class Place;
 #include <cxxabi.h>
 #include <string>
 
-#define PYPROB
-
 //FRED main program
 
 #ifdef PYPROB

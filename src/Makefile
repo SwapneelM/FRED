@@ -43,13 +43,13 @@ endif
 ## compressed population files.  If you have snappy installed,
 ## set the following flag to 1, and make sure the library locations
 ## below are correct.
-SNAPPY = 0
+SNAPPY = 1
 ifeq ($(SNAPPY),1)
-SNAPPY_DIR = /usr/local
+SNAPPY_DIR = /usr
 SNAPPY_INC_DIR = $(SNAPPY_DIR)/include
-SNAPPY_HDR = $(SNAPPY_INC_DIR)/snappy.h 
+SNAPPY_HDR = $(SNAPPY_DIR)/snappy.h 
 INCLUDE_DIRS = -I$(SNAPPY_INC_DIR)
-SNAPPY_LIB_DIR = $(SNAPPY_DIR)/lib
+SNAPPY_LIB_DIR = $(SNAPPY_DIR)/lib/x86_64-linux-gnu
 
 # location of library differs by OS
 OS := $(shell uname)
@@ -105,7 +105,11 @@ LOGGING_LEVEL = $(LOGGING_PRESET_3)
 # CPPFLAGS = -g -std=c++14 $(M64) -O2 $(LOGGING_PRESET_3) -Wall -DSNAPPY=$(SNAPPY)
 
 ## recommended for production runs:
+ifeq ($(PYPROB),0)
 CPPFLAGS = -std=c++14 $(M64) -O3 $(OPENMP) $(LOGGING_LEVEL) -DNCPU=$(NCPU) -DSNAPPY=$(SNAPPY) $(INCLUDE_DIRS)
+else
+CPPFLAGS = -std=c++14 $(M64) -O3 $(OPENMP) $(LOGGING_LEVEL) -DPYPROB -DNCPU=$(NCPU) -DSNAPPY=$(SNAPPY) $(INCLUDE_DIRS)
+endif
 
 FRED_memcheck: 	CPPFLAGS = -g -std=c++14 $(M64) -O0 -fopenmp $(LOGGING_LEVEL) -DNCPU=$(NCPU) -DSNAPPY=$(SNAPPY) -fno-omit-frame-pointer $(INCLUDE_DIRS)
 
