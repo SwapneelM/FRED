@@ -59,14 +59,20 @@ class Place;
 #ifdef PYPROB
 #include <pyprob_cpp.h>
 #include <time.h>
+#include <cmath>
 int _argc;
 char** _argv;
 
-int param_idx(char* param_name)
+int param_idx(string param_name_str)
 {
+  auto param_name = param_name_str.c_str();
+  int idx = -1;
   for(int i = 0; i < Params::param_count; i++)
     if(strcmp(Params::param_name[i], param_name) == 0)
-      return i;
+      idx = i;
+  
+  assert(idx != -1);
+  return idx;
 }
 
 double count_infected()
@@ -101,13 +107,18 @@ xt::xarray<double> forward()
     auto pop_size = Global::Pop.get_pop_size();
     auto infection_count = count_infected();
     auto infection_rate = infection_count / pop_size;
-    std::cout << "-> Total dead: " << total_dead << std::endl;
-    std::cout << "-> Population size: " << pop_size << std::endl;
-    std::cout << "-> Infection count: " << infection_count << std::endl;
-    std::cout << "-> Infection rate: " << infection_rate*100 << '%' << std::endl;
+    std::cout << "-> Total dead: @" << Global::Simulation_Day << " : " << total_dead << std::endl;
+    std::cout << "-> Population size: @" << Global::Simulation_Day << " : " << pop_size << std::endl;
+    std::cout << "-> Infection count: @" << Global::Simulation_Day << " : " << infection_count << std::endl; //TODO
+    std::cout << "-> Infection rate @" << Global::Simulation_Day << " : " << infection_rate*100 << '%' << std::endl;
 
-    // Condition: infection rate < x%
-    // = Observe x% from Uniform(infection_rate, 1+infection_rate)
+    
+    /*--------------- Condition: infection rate ---------------*/
+    /*i.e.
+    z = bool(infection_rate < x)
+    observe(Bernoulli(z), 1)*/
+    // It is equivalent to: Observe x from Uniform(infection_rate, 1+infection_rate)
+    
     auto likelihood = pyprob_cpp::distributions::Uniform(infection_rate, 1+infection_rate);
     pyprob_cpp::observe(likelihood, "obs_" + std::to_string(Global::Simulation_Day));
   }
@@ -173,11 +184,26 @@ void fred_setup(int argc, char* argv[]) {
   Params::read_parameters(paramfile);
 
   #ifdef PYPROB
-  // Sample parameters of interest
-  char param_name[] = "isolation_rate";
-  auto prior = pyprob_cpp::distributions::Uniform(0, 1);
-  auto param_value = pyprob_cpp::sample(prior, std::string(param_name));
-  strcpy(Params::param_value[param_idx(param_name)], to_string(param_value[0]).c_str());
+  /*--------------- Sample parameters of interest ---------------*/
+  string param_sipdm = "shelter_in_place_duration_mean";
+  auto prior_sipdm = pyprob_cpp::distributions::Uniform(0, 14+1);
+  auto param_value_sipdm = pyprob_cpp::sample(prior_sipdm, std::string(param_sipdm));
+  strcpy(Params::param_value[param_idx(param_sipdm)], to_string(int(param_value_sipdm[0])).c_str());
+  
+  string param_scd = "school_closure_duration";
+  auto prior_scd = pyprob_cpp::distributions::Uniform(0, 28+1);
+  auto param_value_scd = pyprob_cpp::sample(prior_scd, std::string(param_scd));
+  strcpy(Params::param_value[param_idx(param_scd)], to_string(int(param_value_scd[0])).c_str());
+  
+  string param_hwc = "hand_washing_compliance";
+  auto prior_hwc = pyprob_cpp::distributions::Uniform(0, 1);
+  auto param_value_hwc = pyprob_cpp::sample(prior_hwc, std::string(param_hwc));
+  strcpy(Params::param_value[param_idx(param_hwc)], to_string(param_value_hwc[0]).c_str());
+  
+  string param_sipc = "shelter_in_place_compliance";
+  auto prior_sipc = pyprob_cpp::distributions::Uniform(0, 1);
+  auto param_value_sipc = pyprob_cpp::sample(prior_sipc, std::string(param_sipc));
+  strcpy(Params::param_value[param_idx(param_sipc)], to_string(param_value_sipc[0]).c_str());
   #endif
 
   Global::get_global_parameters();
