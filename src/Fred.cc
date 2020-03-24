@@ -60,6 +60,7 @@ class Place;
 #include <cmath>
 int _argc;
 char** _argv;
+int initial_pop_size = -1;
 
 int param_idx(string param_name_str)
 {
@@ -97,17 +98,19 @@ double count_infected()
 xt::xarray<double> forward()
 {
   fred_setup(_argc, _argv);
+  initial_pop_size = Global::Pop.get_pop_size();
   for(Global::Simulation_Day = 0; Global::Simulation_Day < Global::Days; Global::Simulation_Day++) {
     fred_step(Global::Simulation_Day);
 
     // Conditions
     auto total_dead = Global::Diseases.get_disease(0)->get_epidemic()->get_total_case_fatality_count();
-    auto pop_size = Global::Pop.get_pop_size();
+    auto current_pop_size = Global::Pop.get_pop_size();
     auto infection_count = count_infected();
-    auto infection_rate = infection_count / pop_size;
+    auto infection_rate = infection_count / initial_pop_size;
     std::cout << "-> Total dead: @" << Global::Simulation_Day << " : " << total_dead << std::endl;
-    std::cout << "-> Population size: @" << Global::Simulation_Day << " : " << pop_size << std::endl;
-    std::cout << "-> Infection count: @" << Global::Simulation_Day << " : " << infection_count << std::endl; //TODO
+    std::cout << "-> Initial population size: @" << Global::Simulation_Day << " : " << initial_pop_size << std::endl;
+    std::cout << "-> Current population size: @" << Global::Simulation_Day << " : " << current_pop_size << std::endl;
+    std::cout << "-> Infection count: @" << Global::Simulation_Day << " : " << infection_count << std::endl;
     std::cout << "-> Infection rate @" << Global::Simulation_Day << " : " << infection_rate*100 << '%' << std::endl;
 
     
@@ -137,8 +140,20 @@ int main(int argc, char *argv[])
 #else
 int main(int argc, char* argv[]) {
   fred_setup(argc, argv);
+  initial_pop_size = Global::Pop.get_pop_size();
   for(Global::Simulation_Day = 0; Global::Simulation_Day < Global::Days; Global::Simulation_Day++) {
     fred_step(Global::Simulation_Day);
+
+    // Conditions
+    auto total_dead = Global::Diseases.get_disease(0)->get_epidemic()->get_total_case_fatality_count();
+    auto current_pop_size = Global::Pop.get_pop_size();
+    auto infection_count = count_infected();
+    auto infection_rate = infection_count / initial_pop_size;
+    std::cout << "-> Total dead: @" << Global::Simulation_Day << " : " << total_dead << std::endl;
+    std::cout << "-> Initial population size: @" << Global::Simulation_Day << " : " << initial_pop_size << std::endl;
+    std::cout << "-> Current population size: @" << Global::Simulation_Day << " : " << current_pop_size << std::endl;
+    std::cout << "-> Infection count: @" << Global::Simulation_Day << " : " << infection_count << std::endl;
+    std::cout << "-> Infection rate @" << Global::Simulation_Day << " : " << infection_rate*100 << '%' << std::endl;
   }
   fred_finish();
   return 0;
@@ -188,10 +203,10 @@ void fred_setup(int argc, char* argv[]) {
   auto param_value_sipdm = pyprob_cpp::sample(prior_sipdm, std::string(param_sipdm));
   strcpy(Params::param_value[param_idx(param_sipdm)], to_string(int(param_value_sipdm[0])).c_str());
   
-  string param_scd = "school_closure_duration";
-  auto prior_scd = pyprob_cpp::distributions::Uniform(0, 28+1);
-  auto param_value_scd = pyprob_cpp::sample(prior_scd, std::string(param_scd));
-  strcpy(Params::param_value[param_idx(param_scd)], to_string(int(param_value_scd[0])).c_str());
+  string param_sct = "school_closure_ar_threshold";
+  auto prior_sct = pyprob_cpp::distributions::Uniform(1, 20+1);
+  auto param_value_sct = pyprob_cpp::sample(prior_sct, std::string(param_sct));
+  strcpy(Params::param_value[param_idx(param_sct)], to_string(int(param_value_sct[0])).c_str());
   
   string param_hwc = "hand_washing_compliance";
   auto prior_hwc = pyprob_cpp::distributions::Uniform(0, 1);
@@ -202,6 +217,16 @@ void fred_setup(int argc, char* argv[]) {
   auto prior_sipc = pyprob_cpp::distributions::Uniform(0, 1);
   auto param_value_sipc = pyprob_cpp::sample(prior_sipc, std::string(param_sipc));
   strcpy(Params::param_value[param_idx(param_sipc)], to_string(param_value_sipc[0]).c_str());
+  
+  string param_esip = "enable_shelter_in_place";
+  auto prior_esip = pyprob_cpp::distributions::Uniform(0, 2);
+  auto param_value_esip = pyprob_cpp::sample(prior_esip, std::string(param_esip));
+  strcpy(Params::param_value[param_idx(param_esip)], to_string(int(param_value_esip[0])).c_str());
+  
+  string param_ir = "isolation_rate";
+  auto prior_ir = pyprob_cpp::distributions::Uniform(0, 1);
+  auto param_value_ir = pyprob_cpp::sample(prior_ir, std::string(param_ir));
+  strcpy(Params::param_value[param_idx(param_ir)], to_string(param_value_ir[0]).c_str());
   #endif
 
   Global::get_global_parameters();
