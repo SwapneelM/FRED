@@ -1,4 +1,4 @@
-fips = 42065 # Punxsutawney (Jefferson County, State of Pennsylvania).
+fips = 42065 # Punxsutawney (Jefferson County, State of Pennsylvania). Population @2010: 45318
 days = 100
 verbose = 0
 enable_visualization_layer = 0
