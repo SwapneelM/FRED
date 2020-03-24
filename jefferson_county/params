@@ -20,7 +20,7 @@ census_tract_visualization_mode = 0
 # - no delay, no decay, no early starting, everyone shelters
 # see lines 2390 - 2431 of Place_List.cc
 ##########################################################
-enable_shelter_in_place = 1 # <--- toggle on or off
+enable_shelter_in_place = 1 # <--- toggle on or off  # <--- put a prior over this
 
 ######################################
 shelter_in_place_duration_mean = 1   # <--- put a prior over this
@@ -30,11 +30,11 @@ shelter_in_place_compliance = 1      # <--- put a prior over this
 ######################################
 # Our assumptions
 shelter_in_place_duration_std = 1
-shelter_in_place_delay_mean = 7
+shelter_in_place_delay_mean = 14
 shelter_in_place_delay_std = 1
 shelter_in_place_early_rate = 0.0  # do people start sheltering before the order goes into effect?
 shelter_in_place_decay_rate = 0.0  # do people stop sheltering gradually the longer it is in place
-shelter_in_place_by_income = 0 # Do only high-income familes shelter?
+shelter_in_place_by_income = 0 # Do only high-income families shelter?
 ######################################
 
 
@@ -49,14 +49,15 @@ shelter_in_place_by_income = 0 # Do only high-income familes shelter?
 
 # school_closure_policy = none # <--- toggle off
 school_closure_policy = global
+school_closure_ar_threshold = 1.0   # <--- put a prior over this
 
 ######################################
-school_closure_duration = 10   # <--- put a prior over this
+school_closure_duration = 21
 ######################################
 
 ######################################
 school_closure_delay = 0 # delay after reaching any trigger before closing schools
-school_closure_day = 7 # day to close school under global policy
+school_closure_day = -1 # day to close school under global policy. -1 means there is no predefined closure date
 ######################################
 
 
@@ -70,4 +71,77 @@ enable_hand_washing = 1  # <--- toggle on
 
 ##########################################################
 hand_washing_compliance = 0.5 # <--- put a prior over this
+##########################################################
+
+##########################################################
+#
+# ISOLATION OF SYMPTOMATICS  
+#
+##########################################################
+
+enable_isolation = 1
+# days after becoming symptomatic when isolation may occur:
+isolation_delay = 1
+# daily probability of entering isolation if symptomatic:
+isolation_rate = 1.0 # <--- put a prior over this
+
+
+##########################################################
+##########################################################
+# Influenza calibration parameters
+##########################################################
+##########################################################
+
+# This file includes a model of influenza in which infectivity starts 1
+# day before symptoms and lasts for 7 days.  Both symptoms and
+# infectivity ramp up and ramp down. Contact rates have been
+# recalibrated and are included below.
+
+#### lognormal incubation and infectious offset
+influenza_symptoms_distributions = lognormal
+influenza_incubation_period_median = 1.9
+influenza_incubation_period_dispersion = 1.51
+influenza_symptoms_duration_median = 5.0
+influenza_symptoms_duration_dispersion = 1.5 
+
+#### infectivity offset from start of symtoms and lasts 7 days
+influenza_infectious_distributions = offset_from_start_of_symptoms
+influenza_infectious_start_offset = -1
+influenza_infectious_end_offset = 6
+
+# rapid rise and gradual decline of symptoms and infectivity
+influenza_full_symptoms_start = 0.0
+influenza_full_symptoms_end = 0.5
+influenza_full_infectivity_start = 0.2
+influenza_full_infectivity_end = 0.3
+
+######################################################
+#
+### PLACE-SPECIFIC CONTACTS FOR RESPIRATORY TRANSMISSION
+#
+# The following contacts are calibrated for Allegheny County
+# for a 33% clinical attack rate using influenza model
+#
+### 2010 v1 calibration for Allegheny County, PA (FIPS=42003)
+
+R0_a = 0.040515
+R0_b = 0.523353
+R0 = -1.0
+
+###  CALIBRATION PHASE II STEP 2 at Wed Dec  2 16:15:01 2015
+###  runs = 20  cores = 4
+household_contacts = 0.2356
+neighborhood_contacts = 1.2017
+school_contacts = 0.9020
+workplace_contacts = 0.1048
+classroom_contacts = 1.8041
+office_contacts = 0.2095
+
+enable_transmission_bias = 1
+neighborhood_same_age_bias = 0.1
+
+##########################################################
+##########################################################
+# END calibration parameters
+##########################################################
 ##########################################################
