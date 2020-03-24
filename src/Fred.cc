@@ -198,13 +198,18 @@ void fred_setup(int argc, char* argv[]) {
 
   #ifdef PYPROB
   /*--------------- Sample parameters of interest ---------------*/
+  string param_scd = "school_closure_duration";
+  auto prior_scd = pyprob_cpp::distributions::Uniform(0, 31+1);
+  auto param_value_scd = pyprob_cpp::sample(prior_scd, std::string(param_scd));
+  strcpy(Params::param_value[param_idx(param_scd)], to_string(int(param_value_scd[0])).c_str());
+
   string param_sipdm = "shelter_in_place_duration_mean";
   auto prior_sipdm = pyprob_cpp::distributions::Uniform(0, 14+1);
   auto param_value_sipdm = pyprob_cpp::sample(prior_sipdm, std::string(param_sipdm));
   strcpy(Params::param_value[param_idx(param_sipdm)], to_string(int(param_value_sipdm[0])).c_str());
   
   string param_sct = "school_closure_ar_threshold";
-  auto prior_sct = pyprob_cpp::distributions::Uniform(1, 20+1);
+  auto prior_sct = pyprob_cpp::distributions::Uniform(0.1, 20+1);
   auto param_value_sct = pyprob_cpp::sample(prior_sct, std::string(param_sct));
   strcpy(Params::param_value[param_idx(param_sct)], to_string(int(param_value_sct[0])).c_str());
   
@@ -217,11 +222,6 @@ void fred_setup(int argc, char* argv[]) {
   auto prior_sipc = pyprob_cpp::distributions::Uniform(0, 1);
   auto param_value_sipc = pyprob_cpp::sample(prior_sipc, std::string(param_sipc));
   strcpy(Params::param_value[param_idx(param_sipc)], to_string(param_value_sipc[0]).c_str());
-  
-  string param_esip = "enable_shelter_in_place";
-  auto prior_esip = pyprob_cpp::distributions::Uniform(0, 2);
-  auto param_value_esip = pyprob_cpp::sample(prior_esip, std::string(param_esip));
-  strcpy(Params::param_value[param_idx(param_esip)], to_string(int(param_value_esip[0])).c_str());
   
   string param_ir = "isolation_rate";
   auto prior_ir = pyprob_cpp::distributions::Uniform(0, 1);

@@ -1,4 +1,6 @@
-fips = 42065 # Punxsutawney (Jefferson County, State of Pennsylvania). Population @2010: 45318
+fips = 42065
+# 42065: Punxsutawney (Jefferson County, State of Pennsylvania)
+# 42003: Allegheny County, PA
 days = 100
 verbose = 0
 enable_visualization_layer = 0
@@ -30,7 +32,7 @@ shelter_in_place_compliance = 1      # <--- put a prior over this
 ######################################
 # Our assumptions
 shelter_in_place_duration_std = 1
-shelter_in_place_delay_mean = 14
+shelter_in_place_delay_mean = 7
 shelter_in_place_delay_std = 1
 shelter_in_place_early_rate = 0.0  # do people start sheltering before the order goes into effect?
 shelter_in_place_decay_rate = 0.0  # do people stop sheltering gradually the longer it is in place
@@ -52,7 +54,7 @@ school_closure_policy = global
 school_closure_ar_threshold = 1.0   # <--- put a prior over this
 
 ######################################
-school_closure_duration = 21
+school_closure_duration = 21        # <--- put a prior over this
 ######################################
 
 ######################################
@@ -86,11 +88,12 @@ isolation_delay = 1
 isolation_rate = 1.0 # <--- put a prior over this
 
 
-##########################################################
-##########################################################
-# Influenza calibration parameters
-##########################################################
-##########################################################
+
+
+######################################################
+#
+# File: params.influenza_ramp
+#
 
 # This file includes a model of influenza in which infectivity starts 1
 # day before symptoms and lasts for 7 days.  Both symptoms and
@@ -140,8 +143,4 @@ office_contacts = 0.2095
 enable_transmission_bias = 1
 neighborhood_same_age_bias = 0.1
 
-##########################################################
-##########################################################
-# END calibration parameters
-##########################################################
-##########################################################
+##################### END calibration parameters
