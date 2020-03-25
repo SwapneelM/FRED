@@ -198,11 +198,6 @@ void fred_setup(int argc, char* argv[]) {
 
   #ifdef PYPROB
   /*--------------- Sample parameters of interest ---------------*/
-  string param_scd = "school_closure_duration";
-  auto prior_scd = pyprob_cpp::distributions::Uniform(0, 31+1);
-  auto param_value_scd = pyprob_cpp::sample(prior_scd, std::string(param_scd));
-  strcpy(Params::param_value[param_idx(param_scd)], to_string(int(param_value_scd[0])).c_str());
-
   string param_sipdm = "shelter_in_place_duration_mean";
   auto prior_sipdm = pyprob_cpp::distributions::Uniform(0, 14+1);
   auto param_value_sipdm = pyprob_cpp::sample(prior_sipdm, std::string(param_sipdm));
