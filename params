@@ -1,7 +1,7 @@
 fips = 42065
 # 42065: Punxsutawney (Jefferson County, State of Pennsylvania)
 # 42003: Allegheny County, PA
-days = 100
+days = 150
 verbose = 0
 enable_visualization_layer = 0
 household_visualization_mode = 0

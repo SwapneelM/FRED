@@ -74,27 +74,6 @@ int param_idx(string param_name_str)
   return idx;
 }
 
-double count_infected()
-{
-  const int DISEASE_ID = 0;
-  auto pop = &(Global::Pop);
-  int internal_pop_count = 0;
-  int infection_count = 0;
-  for (int p = 0; p < pop->get_index_size(); ++p) {
-    Person *person = pop->get_person_by_index(p);
-    if (person == NULL) {
-      continue;
-    }
-    auto health = person->get_health();
-    if(health->is_infected(DISEASE_ID)) {
-      infection_count++;
-    }
-    internal_pop_count++;
-  }
-  assert(internal_pop_count == pop->get_pop_size());
-  return infection_count;
-}
-
 xt::xarray<double> forward()
 {
   fred_setup(_argc, _argv);
@@ -105,7 +84,7 @@ xt::xarray<double> forward()
     // Conditions
     auto total_dead = Global::Diseases.get_disease(0)->get_epidemic()->get_total_case_fatality_count();
     auto current_pop_size = Global::Pop.get_pop_size();
-    auto infection_count = count_infected();
+    auto infection_count = Global::Diseases.get_disease(0)->get_epidemic()->get_infectious_people();
     auto infection_rate = infection_count / initial_pop_size;
     std::cout << "-> Total dead: @" << Global::Simulation_Day << " : " << total_dead << std::endl;
     std::cout << "-> Initial population size: @" << Global::Simulation_Day << " : " << initial_pop_size << std::endl;
