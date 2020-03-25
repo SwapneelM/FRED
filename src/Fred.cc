@@ -85,7 +85,7 @@ xt::xarray<double> forward()
     auto total_dead = Global::Diseases.get_disease(0)->get_epidemic()->get_total_case_fatality_count();
     auto current_pop_size = Global::Pop.get_pop_size();
     auto infection_count = Global::Diseases.get_disease(0)->get_epidemic()->get_infectious_people();
-    auto infection_rate = infection_count / initial_pop_size;
+    auto infection_rate = float(infection_count) / initial_pop_size;
     std::cout << "-> Total dead: @" << Global::Simulation_Day << " : " << total_dead << std::endl;
     std::cout << "-> Initial population size: @" << Global::Simulation_Day << " : " << initial_pop_size << std::endl;
     std::cout << "-> Current population size: @" << Global::Simulation_Day << " : " << current_pop_size << std::endl;
