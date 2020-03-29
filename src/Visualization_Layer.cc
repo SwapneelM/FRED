@@ -232,6 +232,8 @@ void Visualization_Layer::create_data_directories(char* vis_top_dir) {
     // create directories for specific output variables
     sprintf(vis_var_dir, "%s/I", vis_dis_dir);
     Utils::fred_make_directory(vis_var_dir);
+    sprintf(vis_var_dir, "%s/I_new", vis_dis_dir);
+    Utils::fred_make_directory(vis_var_dir);
     sprintf(vis_var_dir, "%s/Is", vis_dis_dir);
     Utils::fred_make_directory(vis_var_dir);
     sprintf(vis_var_dir, "%s/C", vis_dis_dir);
@@ -341,7 +343,7 @@ void Visualization_Layer::print_household_data(char* dir, int disease_id, int da
     Place* house = this->households[i];
     //  just consider human infectious, not mosquito neither infectious places visited
     if(house->get_current_infections(day, disease_id) > 0) {
-      fprintf(fp, "%f %f\n", house->get_latitude(), house->get_longitude());
+      fprintf(fp, "%f %f %d %d\n", house->get_latitude(), house->get_longitude(), size, house->get_current_infections(day, disease_id));
     }
   }
   fclose(fp);
@@ -356,6 +358,18 @@ void Visualization_Layer::print_household_data(char* dir, int disease_id, int da
     if(house->is_human_infectious(disease_id)) {
       fprintf(fp, "%f %f\n", house->get_latitude(), house->get_longitude());
     }
+  }
+  fclose(fp);
+
+  // household with active infections (new version!)
+  sprintf(filename, "%s/dis%d/I_new/households-%d.txt", dir, disease_id, day);
+  fp = fopen(filename, "w");
+  fprintf(fp, "lat long\n");
+  auto people_list = Global::Diseases.get_disease(0)->get_epidemic()->get_actually_infectious_people_list();
+  for(int i = 0; i < people_list.size(); ++i) {
+    Place* house = people_list[i]->get_household();
+    //  just consider human infectious, not mosquito neither infectious places visited
+    fprintf(fp, "%f %f\n", house->get_latitude(), house->get_longitude());
   }
   fclose(fp);
 

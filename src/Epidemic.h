@@ -151,6 +151,10 @@ public:
     return this->infectious_people;
   }
 
+  std::vector<Person*> get_actually_infectious_people_list() {
+    return this->actually_infectious_people;
+  }
+
   int get_removed_people() {
     return this->removed_people;
   }
