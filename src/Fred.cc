@@ -54,13 +54,13 @@ class Place;
 
 //FRED main program
 
+int initial_pop_size = -1;
 #ifdef PYPROB
 #include <pyprob_cpp.h>
 #include <time.h>
 #include <cmath>
 int _argc;
 char** _argv;
-int initial_pop_size = -1;
 
 int param_idx(string param_name_str)
 {
@@ -126,7 +126,7 @@ int main(int argc, char* argv[]) {
     // Conditions
     auto total_dead = Global::Diseases.get_disease(0)->get_epidemic()->get_total_case_fatality_count();
     auto current_pop_size = Global::Pop.get_pop_size();
-    auto infection_count = count_infected();
+    auto infection_count = Global::Diseases.get_disease(0)->get_epidemic()->get_infectious_people();
     auto infection_rate = infection_count / initial_pop_size;
     std::cout << "-> Total dead: @" << Global::Simulation_Day << " : " << total_dead << std::endl;
     std::cout << "-> Initial population size: @" << Global::Simulation_Day << " : " << initial_pop_size << std::endl;
