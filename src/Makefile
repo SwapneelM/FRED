@@ -86,7 +86,11 @@ SRC_DIR = $(shell pwd)
 
 CPP = g++
 CXX = $(CPP)
-LDFLAGS =  -lpyprob_cpp -lzmq 
+ifeq ($(PYPROB),0)
+LDFLAGS = 
+else
+LDFLAGS = -lpyprob_cpp -lzmq 
+endif
 LFLAGS =
 
 # comment out if not using clang (can also be set using an environmental variable)
